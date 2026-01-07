@@ -1,10 +1,16 @@
-const monogoose=require("mongoose")
-const connectDB=async()=>{
-    try{
-      await monogoose.connect("mongodb://127.0.0.1:27017/contact-manager")
-      console.log("DB CONNECTED")
-    }catch(err){
-        console.log("DB ERROR",err);
-    }
-}
-module.exports=connectDB;
+const mongoose = require("mongoose");
+
+const connectDB = async () => {
+  try {
+    await mongoose.connect(process.env.MONGO_URI, {
+      useNewUrlParser: true,
+      useUnifiedTopology: true,
+    });
+    console.log("MongoDB Connected");
+  } catch (err) {
+    console.error("DB ERROR", err);
+    process.exit(1); // crash server if DB fails
+  }
+};
+
+module.exports = connectDB;

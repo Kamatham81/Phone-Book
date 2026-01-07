@@ -1,36 +1,68 @@
-const express=require("express")
-const cors=require("cors")
-const connectDB=require("./config/db");
-const Contact=require("./Contact");
-const app=express();
+const express = require("express");
+const cors = require("cors");
+const connectDB = require("./config/db");
+const Contact = require("./Contact");
+
+const app = express();
+
+// Connect DB
 connectDB();
+
+// Middleware
 app.use(cors());
 app.use(express.json());
 
-//create Contact 
-app.post("/api/contacts",async(req,res)=>{
-    const contact=await Contact.create(req.body);
-    res.send(contact);
-})
-
-//Get all contacts
-app.get("/api/contacts",async(req,res)=>{
-    const contacts=await Contact.find();
-    res.send(contacts);
+// Test route (IMPORTANT)
+app.get("/", (req, res) => {
+  res.send("API is running");
 });
 
-//Update Contact 
-app.put("/api/contacts/:id",async(req,res)=>{
-    const contact=await Contact.findByIdAndDelete(req.params.id,req.body,{
-        new: true,
-    });
-    res.send(contact)
-   
-})
+// Create Contact
+app.post("/api/contacts", async (req, res) => {
+  try {
+    const contact = await Contact.create(req.body);
+    res.json(contact);
+  } catch (error) {
+    res.status(500).json({ message: error.message });
+  }
+});
 
-//Delete Contact 
-app.delete("/api/contacts/:id",async (req,res)=>{
+// Get all contacts
+app.get("/api/contacts", async (req, res) => {
+  try {
+    const contacts = await Contact.find();
+    res.json(contacts);
+  } catch (error) {
+    res.status(500).json({ message: error.message });
+  }
+});
+
+// Update contact
+app.put("/api/contacts/:id", async (req, res) => {
+  try {
+    const contact = await Contact.findByIdAndUpdate(
+      req.params.id,
+      req.body,
+      { new: true }
+    );
+    res.json(contact);
+  } catch (error) {
+    res.status(500).json({ message: error.message });
+  }
+});
+
+// Delete contact
+app.delete("/api/contacts/:id", async (req, res) => {
+  try {
     await Contact.findByIdAndDelete(req.params.id);
-    res.send({message:"Deleted"})
-})
-app.listen(5000,()=>console.log("Server running on port 5000"))
+    res.json({ message: "Deleted" });
+  } catch (error) {
+    res.status(500).json({ message: error.message });
+  }
+});
+
+// PORT (Render compatible)
+const PORT = process.env.PORT || 5000;
+app.listen(PORT, () => {
+  console.log(`Server running on port ${PORT}`);
+});
